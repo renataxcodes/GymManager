@@ -1,0 +1,354 @@
+# Plano de Projeto — Gerenciador de Treinos
+
+**Projeto:** Gerenciador de Treinos
+**Disciplina:** Gerência de Configuração
+**Documento:** Documento 1 — Plano de Projeto
+**Versão:** 1.0
+**Status:** Em desenvolvimento
+
+---
+
+# 1. Introdução
+
+## 1.1 Objetivo
+
+Este documento apresenta o planejamento do projeto **Gerenciador de Treinos**, desenvolvido como parte do Projeto Integrador da disciplina de Gerência de Configuração.
+
+O objetivo do projeto é desenvolver uma aplicação web que permita a personal trainers gerenciar seus alunos e criar treinos personalizados, enquanto os alunos poderão acessar e consultar os treinos disponibilizados.
+
+O Plano de Projeto tem como finalidade organizar as atividades da equipe, definir os principais artefatos do projeto e estabelecer práticas de controle e versionamento durante o desenvolvimento.
+
+## 1.2 Escopo do Projeto
+
+O projeto contempla o desenvolvimento de um sistema web para gerenciamento de treinos.
+
+As principais funcionalidades previstas são:
+
+* Cadastro e gerenciamento de usuários;
+* Cadastro e gerenciamento de alunos;
+* Cadastro de exercícios;
+* Criação e edição de treinos;
+* Associação de treinos aos alunos;
+* Visualização dos treinos pelos alunos;
+* Controle de acesso de acordo com o tipo de usuário.
+
+O projeto não contempla inicialmente:
+
+* Pagamentos online;
+* Aplicativo mobile nativo;
+* Prescrição médica;
+* Diagnóstico médico;
+* Integração com dispositivos de monitoramento;
+* Integração com sistemas externos de academias.
+
+---
+
+# 2. Objetivos do Projeto
+
+## 2.1 Objetivo Geral
+
+Desenvolver um sistema web para facilitar o gerenciamento de treinos entre personal trainers e alunos, centralizando informações sobre exercícios e treinos em uma única aplicação.
+
+## 2.2 Objetivos Específicos
+
+* Permitir o cadastro de personal trainers e alunos;
+* Permitir o cadastro de exercícios;
+* Permitir a criação de treinos personalizados;
+* Permitir a associação de treinos aos alunos;
+* Permitir que os alunos consultem seus treinos;
+* Organizar as informações dos treinos;
+* Aplicar práticas de Gerência de Configuração durante o desenvolvimento;
+* Utilizar controle de versão para acompanhar as alterações realizadas no projeto.
+
+---
+
+# 3. Equipe do Projeto
+
+A equipe será responsável pelo planejamento, documentação, desenvolvimento, testes e controle dos artefatos do sistema.
+
+| Membro   | Função                          | Responsabilidades                                                          |
+| -------- | ------------------------------- | -------------------------------------------------------------------------- |
+| Membro 1 | Gerente de Projeto/Configuração | Organização do projeto, GitHub, controle de versão e Itens de Configuração |
+| Membro 2 | Desenvolvimento                 | Desenvolvimento do sistema                                                 |
+| Membro 3 | Banco de Dados                  | Modelagem e implementação do banco de dados                                |
+| Membro 4 | Documentação/Testes             | Documentação, protótipos e testes                                          |
+
+> **Observação:** os nomes e funções deverão ser atualizados pela equipe conforme a divisão real de responsabilidades.
+
+---
+
+# 4. Tecnologias Previstas
+
+As seguintes tecnologias serão utilizadas ou avaliadas durante o desenvolvimento:
+
+| Tecnologia | Utilização                                           |
+| ---------- | ---------------------------------------------------- |
+| HTML       | Estrutura das páginas                                |
+| CSS        | Estilização e layout                                 |
+| JavaScript | Interações da interface                              |
+| Python     | Desenvolvimento do back-end                          |
+| Flask      | Framework para desenvolvimento web                   |
+| MySQL      | Banco de dados                                       |
+| Git        | Controle de versão                                   |
+| GitHub     | Hospedagem do repositório e gerenciamento do projeto |
+
+---
+
+# 5. Organização do Repositório
+
+O projeto será organizado no GitHub de acordo com os tipos de artefatos produzidos.
+
+```text
+gerenciador-de-treinos/
+│
+├── README.md
+│
+├── docs/
+│   ├── Documento_1_Plano_de_Projeto.md
+│   └── Documento_2_Requisitos.md
+│
+├── diagramas/
+│   ├── caso-de-uso.png
+│   ├── diagrama-de-classes.png
+│   └── modelo-banco.png
+│
+├── prototipos/
+│   ├── login.png
+│   ├── dashboard-personal.png
+│   ├── dashboard-aluno.png
+│   ├── cadastro-aluno.png
+│   └── cadastro-treino.png
+│
+├── src/
+│
+├── database/
+│   ├── schema.sql
+│   └── inserts.sql
+│
+└── .gitignore
+```
+
+A estrutura poderá ser modificada conforme a evolução do projeto.
+
+---
+
+# 6. Itens de Configuração
+
+Os artefatos considerados relevantes para o controle do projeto serão identificados como **Itens de Configuração (ICs)**.
+
+| Código | Item de Configuração     | Localização                             |
+| ------ | ------------------------ | --------------------------------------- |
+| IC01   | Plano de Projeto         | `/docs/Documento_1_Plano_de_Projeto.md` |
+| IC02   | Documento de Requisitos  | `/docs/Documento_2_Requisitos.md`       |
+| IC03   | Diagrama de Casos de Uso | `/diagramas/caso-de-uso.png`            |
+| IC04   | Diagrama de Classes      | `/diagramas/diagrama-de-classes.png`    |
+| IC05   | Protótipos de Interface  | `/prototipos/`                          |
+| IC06   | Código-Fonte             | `/src/`                                 |
+| IC07   | Banco de Dados           | `/database/`                            |
+| IC08   | README                   | `/README.md`                            |
+
+Os Itens de Configuração deverão ser versionados e suas alterações deverão ser registradas no histórico do repositório.
+
+---
+
+# 7. Controle de Versão
+
+O projeto utilizará **Git** para controle de versão e **GitHub** como plataforma para armazenamento e colaboração.
+
+O controle de versão permitirá:
+
+* Registrar alterações;
+* Identificar os responsáveis pelas alterações;
+* Recuperar versões anteriores;
+* Acompanhar a evolução dos artefatos;
+* Facilitar o trabalho colaborativo;
+* Manter o histórico do projeto.
+
+## 7.1 Commits
+
+Os commits deverão utilizar mensagens objetivas que indiquem a alteração realizada.
+
+Exemplos:
+
+```text
+docs: adiciona plano de projeto
+docs: adiciona documento de requisitos
+docs: atualiza matriz de rastreabilidade
+docs: adiciona diagrama de casos de uso
+feat: adiciona cadastro de alunos
+feat: adiciona cadastro de exercícios
+feat: adiciona gerenciamento de treinos
+fix: corrige cadastro de alunos
+```
+
+## 7.2 Branches
+
+Quando necessário, a equipe poderá utilizar branches para desenvolver funcionalidades separadamente.
+
+Exemplo:
+
+```text
+main
+│
+└── develop
+    │
+    ├── feature/cadastro-alunos
+    ├── feature/cadastro-exercicios
+    └── feature/gerenciamento-treinos
+```
+
+A branch `main` deverá representar uma versão estável do projeto.
+
+---
+
+# 8. Gerência de Configuração
+
+A Gerência de Configuração será utilizada para identificar, controlar e acompanhar os artefatos produzidos durante o projeto.
+
+As principais atividades serão:
+
+1. Identificação dos Itens de Configuração;
+2. Controle das versões;
+3. Registro das alterações;
+4. Controle das mudanças;
+5. Rastreabilidade entre requisitos e artefatos;
+6. Organização do repositório;
+7. Manutenção do histórico de alterações.
+
+O **Documento de Requisitos** passou a fazer parte dos Itens de Configuração do projeto nesta etapa.
+
+---
+
+# 9. Controle de Mudanças
+
+Alterações relevantes nos requisitos ou em outros Itens de Configuração deverão ser analisadas pela equipe antes de serem incorporadas ao projeto.
+
+Quando uma mudança for aprovada, deverão ser identificados:
+
+* O item que será alterado;
+* O motivo da alteração;
+* Os requisitos afetados;
+* Os artefatos afetados;
+* O responsável pela alteração;
+* A nova versão do artefato.
+
+As alterações deverão ser registradas no Git por meio de commits.
+
+---
+
+# 10. Cronograma
+
+O cronograma apresenta as principais etapas previstas para o desenvolvimento do projeto.
+
+| Etapa | Atividade                             | Período                           |
+| ----- | ------------------------------------- | --------------------------------- |
+| 1     | Definição do problema e do sistema    | Etapa 1                           |
+| 2     | Planejamento do projeto               | Etapa 1                           |
+| 3     | Definição dos requisitos              | Etapa 2                           |
+| 4     | Elaboração do Documento de Requisitos | Etapa 2                           |
+| 5     | Criação dos diagramas                 | Etapa 2                           |
+| 6     | Criação dos protótipos                | Etapa 2                           |
+| 7     | Modelagem do banco de dados           | Etapa seguinte                    |
+| 8     | Desenvolvimento do back-end           | Etapa seguinte                    |
+| 9     | Desenvolvimento do front-end          | Etapa seguinte                    |
+| 10    | Integração do sistema                 | Etapa seguinte                    |
+| 11    | Testes                                | Etapa seguinte                    |
+| 12    | Correções e melhorias                 | Etapa seguinte                    |
+| 13    | Entrega final                         | Conforme cronograma da disciplina |
+
+---
+
+# 11. Riscos do Projeto
+
+| Risco                                | Impacto | Estratégia                                                  |
+| ------------------------------------ | ------- | ----------------------------------------------------------- |
+| Atraso nas atividades                | Alto    | Dividir as tarefas entre os membros da equipe               |
+| Falhas na comunicação                | Médio   | Utilizar ferramentas de comunicação e reuniões da equipe    |
+| Perda de arquivos                    | Alto    | Utilizar Git e GitHub para versionamento                    |
+| Alterações frequentes nos requisitos | Médio   | Registrar e controlar as mudanças                           |
+| Dificuldades técnicas                | Médio   | Pesquisar, testar e dividir problemas entre os membros      |
+| Conflitos de código                  | Médio   | Utilizar branches e realizar integração de forma organizada |
+| Falta de integração entre módulos    | Alto    | Definir previamente a estrutura do sistema                  |
+
+---
+
+# 12. Comunicação da Equipe
+
+A comunicação entre os integrantes deverá ser realizada por ferramentas definidas pela equipe.
+
+As decisões relevantes para o projeto deverão ser registradas sempre que necessário, especialmente aquelas relacionadas a:
+
+* Alterações nos requisitos;
+* Alterações na arquitetura;
+* Mudanças no banco de dados;
+* Mudanças nos responsáveis pelas tarefas;
+* Alterações nos Itens de Configuração.
+
+---
+
+# 13. Rastreabilidade
+
+A rastreabilidade será utilizada para relacionar os requisitos aos artefatos responsáveis por sua implementação.
+
+A matriz de rastreabilidade será mantida no **Documento de Requisitos**, permitindo relacionar:
+
+```text
+Requisito
+    ↓
+Item de Configuração
+    ↓
+Implementação
+    ↓
+Versão
+```
+
+Exemplo:
+
+| Requisito                     | Item de Configuração | Implementação                         |
+| ----------------------------- | -------------------- | ------------------------------------- |
+| RF02 — Cadastro de Aluno      | IC06 / IC07          | Módulo de alunos + banco de dados     |
+| RF08 — Cadastro de Exercícios | IC06 / IC07          | Módulo de exercícios + banco de dados |
+| RF10 — Criação de Treino      | IC06 / IC07          | Módulo de treinos + banco de dados    |
+| RF16 — Visualização do Treino | IC05 / IC06          | Interface do aluno + código           |
+
+---
+
+# 14. Atualização do Plano de Projeto
+
+Esta versão do Plano de Projeto corresponde à atualização realizada para a segunda etapa do Projeto Integrador.
+
+A principal atualização desta versão é a inclusão do **Documento de Requisitos como novo Item de Configuração**, juntamente com os artefatos de modelagem e prototipação previstos para esta etapa.
+
+## 14.1 Histórico de Versões
+
+| Versão | Data          | Alteração                                                          | Responsável |
+| ------ | ------------- | ------------------------------------------------------------------ | ----------- |
+| 1.0    | Etapa 1       | Criação do Plano de Projeto                                        | Equipe      |
+| 2.0    | Setembro/2026 | Atualização do plano e inclusão do Documento de Requisitos como IC | Equipe      |
+
+---
+
+# 15. Critérios de Conclusão
+
+O projeto será considerado em conformidade com o planejamento quando:
+
+* Os requisitos estiverem documentados;
+* Os principais artefatos estiverem identificados como Itens de Configuração;
+* O repositório estiver organizado;
+* As alterações estiverem registradas no Git;
+* A matriz de rastreabilidade estiver atualizada;
+* Os diagramas previstos estiverem disponíveis;
+* Os protótipos principais estiverem elaborados;
+* O sistema estiver desenvolvido de acordo com os requisitos definidos;
+* Os testes previstos forem realizados;
+* A documentação estiver atualizada.
+
+---
+
+# 16. Considerações Finais
+
+O presente Plano de Projeto estabelece as diretrizes para o desenvolvimento do **Gerenciador de Treinos**, definindo objetivos, escopo, equipe, tecnologias, organização do repositório, Itens de Configuração, controle de versão, mudanças, riscos e cronograma.
+
+A utilização das práticas de Gerência de Configuração permitirá que a equipe acompanhe a evolução do projeto, mantenha o histórico dos artefatos e tenha maior controle sobre as alterações realizadas durante o desenvolvimento.
+
+Este documento poderá ser atualizado conforme o projeto evoluir. Todas as alterações deverão ser registradas por meio do controle de versão adotado pela equipe.
