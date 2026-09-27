@@ -6,7 +6,7 @@ Sistema web para gerenciamento de treinos entre personal trainers e alunos.
 ## Sobre o projeto
 
 O sistema tem como objetivo facilitar a criação, organização e acompanhamento
-de treinos, permitindo que o personal trainer gerencie seus alunos e monte
+de treinos, permitindo que o personal trainer gerencie seus alunos e montar
 treinos personalizados, enquanto o aluno pode consultar seus exercícios e
 informações de treinamento.
 
