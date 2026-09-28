@@ -1,0 +1,673 @@
+# ESPECIFICAÇÃO DE REQUISITOS DE SOFTWARE (ERS)
+
+**Projeto:** GymManager (Gerenciador de Treinos)
+**Disciplina:** Gerência de Configuração
+**Documento:** Documento 2 — Documento de Requisitos
+**Status:** Em desenvolvimento
+
+| Data | Versão | Descrição | Responsável |
+|---|---|---|---|
+| 09/2026 | 1.0 | Criação do Documento de Requisitos | Equipe |
+
+---
+
+## 1. Introdução
+
+### 1.1 Propósito
+
+Este documento tem como objetivo apresentar e especificar os requisitos do sistema GymManager (Gerenciador de Treinos), definindo suas principais funcionalidades, características, restrições e necessidades para o desenvolvimento da aplicação.
+
+O sistema será desenvolvido para auxiliar profissionais de educação física, especialmente personal trainers, na criação, organização e gerenciamento de treinos. Os alunos também poderão utilizar o sistema para consultar os treinos disponibilizados pelo profissional.
+
+Este documento servirá como referência para o desenvolvimento do sistema e será considerado um Item de Configuração (IC) do projeto, sendo controlado por meio de versionamento.
+
+### 1.2 Escopo
+
+O GymManager será uma aplicação web destinada ao gerenciamento de treinos entre personal trainers e alunos.
+
+O sistema permitirá que o personal trainer cadastre e gerencie alunos, cadastre exercícios e crie treinos personalizados. Os alunos poderão acessar seus treinos e visualizar as informações dos exercícios definidos pelo profissional.
+
+As principais funcionalidades previstas são:
+
+- Autenticação de usuários;
+- Cadastro e gerenciamento de alunos;
+- Cadastro e gerenciamento de exercícios;
+- Criação e edição de treinos;
+- Associação de treinos aos alunos;
+- Visualização dos treinos pelos alunos;
+- Visualização das informações dos exercícios.
+
+### 1.3 Fora do Escopo
+
+Não fazem parte do escopo inicial do sistema:
+
+- Pagamento de mensalidades;
+- Prescrição médica;
+- Diagnóstico de doenças;
+- Integração com dispositivos de monitoramento físico;
+- Integração com academias externas;
+- Aplicativo mobile nativo;
+- Consultas ou diagnósticos médicos.
+
+### 1.4 Visão Geral do Sistema
+
+O sistema será uma aplicação web composta por dois tipos principais de usuários:
+
+- **Personal Trainer:** responsável pelo gerenciamento dos alunos, exercícios e treinos;
+- **Aluno:** responsável por consultar os treinos disponibilizados pelo personal trainer.
+
+O personal poderá criar treinos personalizados para seus alunos, adicionando exercícios e definindo informações como séries, repetições, carga e intervalo. O aluno poderá acessar sua conta e consultar os treinos que foram disponibilizados pelo personal.
+
+### 1.5 Definições e Acrônimos
+
+| Termo | Definição |
+|---|---|
+| RF | Requisito Funcional |
+| RNF | Requisito Não Funcional |
+| IC | Item de Configuração |
+| UC | Caso de Uso (*Use Case*) |
+| CRUD | Create, Read, Update e Delete |
+| API REST | Interface de programação baseada em HTTP e recursos, com troca de dados em JSON |
+| Personal Trainer | Profissional responsável pela elaboração e gerenciamento dos treinos |
+| Aluno | Usuário que realiza os treinos cadastrados pelo personal |
+| Treino | Conjunto organizado de exercícios destinado a um aluno |
+| Exercício | Atividade física cadastrada no sistema |
+
+### 1.6 Descrição Geral
+
+#### 1.6.1 Perspectiva do Produto
+
+O GymManager será desenvolvido como uma aplicação web acessível por meio de navegadores. A aplicação será composta por uma interface de usuário, uma camada responsável pelo processamento das informações e um banco de dados responsável pelo armazenamento dos dados do sistema.
+
+As tecnologias previstas para o desenvolvimento são: HTML, CSS, JavaScript, Python, Flask e MySQL.
+
+#### 1.6.2 Características dos Usuários
+
+**Personal Trainer** — responsável pelo gerenciamento dos alunos e pela elaboração dos treinos. Realiza login; cadastra, consulta, edita e exclui alunos; cadastra e consulta exercícios; cria, edita e exclui treinos; adiciona exercícios aos treinos; define séries, repetições, carga e intervalo; associa treinos aos alunos.
+
+**Aluno** — utiliza o sistema principalmente para consultar seus treinos. Realiza login; visualiza seus dados, seus treinos, os exercícios, as séries e repetições, e as cargas e intervalos cadastrados.
+
+#### 1.6.3 Restrições
+
+- O acesso às funcionalidades deverá ser controlado de acordo com o tipo de usuário;
+- Os dados deverão ser armazenados em um banco de dados;
+- Funcionalidades administrativas deverão estar disponíveis somente para usuários autorizados;
+- O sistema deverá funcionar em navegadores modernos;
+- Os principais artefatos do projeto deverão ser controlados por versionamento;
+- Alterações relevantes deverão ser registradas no histórico do projeto.
+
+#### 1.6.4 Suposições
+
+- Os usuários possuirão acesso à internet;
+- O personal trainer será responsável pelo cadastro e gerenciamento dos treinos;
+- Os dados fornecidos pelos usuários serão válidos;
+- O sistema será utilizado inicialmente em ambiente web;
+- O banco de dados estará disponível para o funcionamento da aplicação.
+
+---
+
+## 2. Arquitetura Geral do Sistema
+
+O diagrama de pacotes abaixo apresenta a organização lógica do sistema em camadas e os pacotes previstos em cada uma delas.
+
+```mermaid
+flowchart TB
+    subgraph APRESENTACAO["Camada de Apresentação"]
+        T["templates (HTML)"]
+        S["static (CSS e JavaScript)"]
+    end
+
+    subgraph APLICACAO["Camada de Aplicação (Flask)"]
+        R["routes (rotas e controladores)"]
+        AU["auth (login e controle de acesso)"]
+        SV["services (regras de negócio)"]
+        VL["validators (regras de validação)"]
+    end
+
+    subgraph DADOS["Camada de Dados"]
+        M["models (acesso aos dados)"]
+        DB[("MySQL")]
+    end
+
+    T --> R
+    S --> T
+    R --> AU
+    R --> SV
+    SV --> VL
+    SV --> M
+    AU --> M
+    M --> DB
+```
+
+### 2.1 Arquitetura de Camadas
+
+| Camada | Responsabilidade | Tecnologias |
+|---|---|---|
+| Apresentação | Exibir as telas, receber as ações do usuário e adaptar a interface a diferentes tamanhos de tela | HTML, CSS, JavaScript |
+| Aplicação | Autenticar usuários, controlar o acesso por perfil, aplicar regras de negócio e validações, expor as rotas e a API REST | Python, Flask |
+| Dados | Persistir e recuperar as informações do sistema, garantindo a integridade dos dados | MySQL |
+
+A comunicação entre as camadas segue um fluxo único: a apresentação só se comunica com a aplicação, e somente a aplicação acessa o banco de dados.
+
+---
+
+## 3. Modelo de Casos de Uso
+
+### 3.1 Detalhados
+
+Atores do sistema:
+
+- **Personal Trainer:** responsável pelo gerenciamento dos alunos, exercícios e treinos.
+- **Aluno:** responsável pela consulta dos treinos e exercícios disponibilizados pelo personal trainer.
+
+| ID | ATOR | DESCRIÇÃO |
+|---|---|---|
+| UC01 | Personal Trainer, Aluno | Realizar login: o usuário informa suas credenciais e, se válidas, acessa as funcionalidades do seu perfil. |
+| UC02 | Personal Trainer | Cadastrar personal: registra um personal trainer com os dados necessários para identificação e acesso ao sistema. |
+| UC03 | Personal Trainer | Cadastrar aluno: registra um novo aluno informando seus dados básicos. |
+| UC04 | Personal Trainer | Consultar alunos: lista e consulta os alunos cadastrados. |
+| UC05 | Personal Trainer | Editar aluno: altera os dados de um aluno cadastrado. |
+| UC06 | Personal Trainer | Excluir aluno: remove um aluno cadastrado, respeitando as regras de integridade do banco de dados. |
+| UC07 | Personal Trainer | Cadastrar exercício: registra um exercício com nome, descrição e grupo muscular. |
+| UC08 | Personal Trainer | Consultar exercícios: lista e consulta os exercícios cadastrados. |
+| UC09 | Personal Trainer | Criar treino: cria um treino para um aluno. |
+| UC10 | Personal Trainer | Adicionar exercícios ao treino: inclui exercícios cadastrados em um treino. |
+| UC11 | Personal Trainer | Definir séries, repetições, carga e intervalo: configura os dados de cada exercício dentro do treino. |
+| UC12 | Personal Trainer | Editar treino: altera as informações de um treino existente. |
+| UC13 | Personal Trainer | Excluir treino: remove um treino existente. |
+| UC14 | Personal Trainer | Associar treino ao aluno: vincula um treino a um aluno específico. |
+| UC15 | Aluno | Consultar seus dados: visualiza as informações do seu próprio cadastro. |
+| UC16 | Aluno | Visualizar seus treinos: lista os treinos associados ao seu perfil. |
+| UC17 | Aluno | Visualizar exercícios do treino: consulta os exercícios do treino, com séries, repetições, carga e intervalo, quando cadastrados. |
+| UC18 | Aluno | Consultar histórico de treinos: consulta treinos anteriormente disponibilizados (funcionalidade opcional). |
+
+### 3.2 Diagramas de Caso de Uso
+
+> Os diagramas abaixo usam Mermaid e são renderizados automaticamente pelo GitHub. Caso a equipe prefira imagem, exporte-os para `/diagramas/caso-de-uso.png`.
+
+#### Diagrama geral
+
+```mermaid
+flowchart LR
+    P(["Personal Trainer"])
+    A(["Aluno"])
+
+    subgraph SIS["GymManager"]
+        UC01("UC01 - Realizar login")
+        UC02("UC02 - Cadastrar personal")
+        UC03("UC03 - Cadastrar aluno")
+        UC04("UC04 - Consultar alunos")
+        UC05("UC05 - Editar aluno")
+        UC06("UC06 - Excluir aluno")
+        UC07("UC07 - Cadastrar exercício")
+        UC08("UC08 - Consultar exercícios")
+        UC09("UC09 - Criar treino")
+        UC10("UC10 - Adicionar exercícios ao treino")
+        UC11("UC11 - Definir séries, repetições, carga e intervalo")
+        UC12("UC12 - Editar treino")
+        UC13("UC13 - Excluir treino")
+        UC14("UC14 - Associar treino ao aluno")
+        UC15("UC15 - Consultar seus dados")
+        UC16("UC16 - Visualizar seus treinos")
+        UC17("UC17 - Visualizar exercícios do treino")
+        UC18("UC18 - Consultar histórico de treinos")
+    end
+
+    P --- UC01
+    P --- UC02
+    P --- UC03
+    P --- UC04
+    P --- UC05
+    P --- UC06
+    P --- UC07
+    P --- UC08
+    P --- UC09
+    P --- UC10
+    P --- UC11
+    P --- UC12
+    P --- UC13
+    P --- UC14
+
+    A --- UC01
+    A --- UC15
+    A --- UC16
+    A --- UC17
+    A --- UC18
+
+    UC10 -. "«include»" .-> UC11
+```
+
+#### UC01 - Realizar login
+
+```mermaid
+flowchart TD
+    I(["Início"]) --> E["Usuário informa e-mail e senha"]
+    E --> V{"Credenciais válidas?"}
+    V -- Não --> ER["Exibe mensagem de erro"]
+    ER --> E
+    V -- Sim --> T{"Tipo de usuário"}
+    T -- Personal --> DP["Abre o dashboard do Personal Trainer"]
+    T -- Aluno --> DA["Abre o dashboard do Aluno"]
+    DP --> F(["Fim"])
+    DA --> F
+```
+
+#### UC09 a UC14 - Montagem e atribuição de treino
+
+```mermaid
+flowchart TD
+    I(["Início"]) --> C["UC09: Personal cria o treino (nome e descrição)"]
+    C --> AD["UC10: Adiciona exercícios cadastrados ao treino"]
+    AD --> CF["UC11: Define séries, repetições, carga e intervalo de cada exercício"]
+    CF --> M{"Mais exercícios?"}
+    M -- Sim --> AD
+    M -- Não --> AS["UC14: Associa o treino a um aluno"]
+    AS --> F(["Fim: aluno passa a visualizar o treino (UC16 e UC17)"])
+```
+
+### 3.3 Diagrama de Classes (descrição)
+
+O diagrama de classes conceitual representa as principais entidades do sistema.
+
+> Para uso como imagem, exporte para `/diagramas/diagrama-de-classes.png`.
+
+```mermaid
+classDiagram
+    class Usuario {
+        +int id
+        +string nome
+        +string email
+        +string senha
+        +string tipo_usuario
+    }
+    class Personal {
+        +int id
+        +string telefone
+        +string cref
+    }
+    class Aluno {
+        +int id
+        +date data_nascimento
+        +string telefone
+        +int id_personal
+    }
+    class Exercicio {
+        +int id
+        +string nome
+        +string descricao
+        +string grupo_muscular
+    }
+    class Treino {
+        +int id
+        +string nome
+        +string descricao
+        +int id_aluno
+        +int id_personal
+    }
+    class ItemTreino {
+        +int id
+        +int id_treino
+        +int id_exercicio
+        +int series
+        +int repeticoes
+        +decimal carga
+        +int intervalo
+    }
+
+    Usuario <|-- Personal
+    Usuario <|-- Aluno
+    Personal "1" --> "0..*" Aluno : é responsável por
+    Personal "1" --> "0..*" Treino : elabora
+    Aluno "1" --> "0..*" Treino : recebe
+    Treino "1" *-- "1..*" ItemTreino : contém
+    Exercicio "1" --> "0..*" ItemTreino : compõe
+```
+
+| Classe | Descrição |
+|---|---|
+| Usuário | Representa qualquer pessoa com acesso ao sistema; guarda as credenciais e o tipo de usuário (personal ou aluno). |
+| Personal | Especialização de Usuário; reúne os dados pessoais e profissionais do personal trainer. |
+| Aluno | Especialização de Usuário; reúne os dados pessoais do aluno e o personal responsável por ele. |
+| Exercício | Atividade física cadastrada no sistema, com nome, descrição e grupo muscular. |
+| Treino | Conjunto organizado de exercícios elaborado por um personal e destinado a um aluno. |
+| Item do Treino | Liga um exercício a um treino e guarda séries, repetições, carga e intervalo. |
+
+---
+
+## 4. Estrutura do Banco de Dados (modelo lógico simplificado)
+
+```mermaid
+erDiagram
+    USUARIO ||--o| PERSONAL : "é"
+    USUARIO ||--o| ALUNO : "é"
+    PERSONAL ||--o{ ALUNO : "é responsável por"
+    PERSONAL ||--o{ TREINO : elabora
+    ALUNO ||--o{ TREINO : recebe
+    TREINO ||--|{ ITEM_TREINO : contém
+    EXERCICIO ||--o{ ITEM_TREINO : compõe
+```
+
+**Tabela `usuario`**
+
+| Coluna | Tipo | Restrições |
+|---|---|---|
+| id | INT | PK, AUTO_INCREMENT |
+| nome | VARCHAR(100) | NOT NULL |
+| email | VARCHAR(120) | NOT NULL, UNIQUE |
+| senha | VARCHAR(255) | NOT NULL (armazenada como hash) |
+| tipo_usuario | ENUM('personal','aluno') | NOT NULL |
+
+**Tabela `personal`**
+
+| Coluna | Tipo | Restrições |
+|---|---|---|
+| id | INT | PK, FK → usuario.id |
+| telefone | VARCHAR(20) | |
+| cref | VARCHAR(20) | UNIQUE |
+
+**Tabela `aluno`**
+
+| Coluna | Tipo | Restrições |
+|---|---|---|
+| id | INT | PK, FK → usuario.id |
+| data_nascimento | DATE | |
+| telefone | VARCHAR(20) | |
+| id_personal | INT | NOT NULL, FK → personal.id |
+
+**Tabela `exercicio`**
+
+| Coluna | Tipo | Restrições |
+|---|---|---|
+| id | INT | PK, AUTO_INCREMENT |
+| nome | VARCHAR(100) | NOT NULL |
+| descricao | TEXT | |
+| grupo_muscular | VARCHAR(50) | NOT NULL |
+
+**Tabela `treino`**
+
+| Coluna | Tipo | Restrições |
+|---|---|---|
+| id | INT | PK, AUTO_INCREMENT |
+| nome | VARCHAR(100) | NOT NULL |
+| descricao | TEXT | |
+| id_aluno | INT | FK → aluno.id |
+| id_personal | INT | NOT NULL, FK → personal.id |
+
+**Tabela `item_treino`**
+
+| Coluna | Tipo | Restrições |
+|---|---|---|
+| id | INT | PK, AUTO_INCREMENT |
+| id_treino | INT | NOT NULL, FK → treino.id |
+| id_exercicio | INT | NOT NULL, FK → exercicio.id |
+| series | INT | NOT NULL |
+| repeticoes | INT | NOT NULL |
+| carga | DECIMAL(6,2) | valor em kg |
+| intervalo | INT | valor em segundos |
+
+**Regras de integridade referencial**
+
+| Relacionamento | Ação na exclusão | Justificativa |
+|---|---|---|
+| treino → item_treino | CASCADE | Os itens não existem sem o treino. |
+| aluno → treino | CASCADE, com confirmação prévia no sistema | Ao excluir um aluno, seus treinos deixam de ter sentido (RF05). |
+| exercicio → item_treino | RESTRICT | Impede excluir um exercício em uso por algum treino. |
+| personal → aluno | RESTRICT | Um personal com alunos vinculados não pode ser removido. |
+
+---
+
+## 5. Regras de Validação
+
+| ID | Campo / Contexto | Regra |
+|---|---|---|
+| RV01 | E-mail | Obrigatório, em formato válido e único no sistema. |
+| RV02 | Senha | Obrigatória, com no mínimo 8 caracteres; armazenada apenas como hash. |
+| RV03 | Nome (usuário, exercício, treino) | Obrigatório, sem ser composto apenas por espaços. |
+| RV04 | Tipo de usuário | Deve ser `personal` ou `aluno`. |
+| RV05 | Grupo muscular | Obrigatório no cadastro de exercício. |
+| RV06 | Séries e repetições | Números inteiros maiores que zero. |
+| RV07 | Carga | Número decimal maior ou igual a zero, em kg. |
+| RV08 | Intervalo | Número inteiro maior ou igual a zero, em segundos. |
+| RV09 | Treino | Deve ter nome e estar associado a um aluno para ficar visível ao aluno. |
+| RV10 | Exclusão de exercício | Bloqueada enquanto o exercício estiver em uso em algum treino. |
+| RV11 | Exclusão de aluno ou treino | Exige confirmação do usuário antes de ser executada. |
+| RV12 | Acesso aos dados | O aluno só acessa seus próprios dados e treinos; o personal só gerencia seus alunos e treinos. |
+| RV13 | Rotas protegidas | Exigem usuário autenticado; sem autenticação, o sistema redireciona para o login. |
+
+---
+
+## 6. Requisitos de Interface
+
+### 6.1 Requisitos gerais
+
+- A navegação deve ser simples, organizada e compreensível (RNF03);
+- A interface deve ser responsiva, funcionando em computadores, tablets e smartphones (RNF04);
+- Erros de validação devem ser exibidos junto ao campo correspondente, com mensagem clara;
+- Ações de exclusão devem pedir confirmação;
+- O menu exibido deve corresponder ao perfil do usuário autenticado (RF07).
+
+### 6.2 Telas previstas
+
+| ID | Tela | Perfil | Descrição |
+|---|---|---|---|
+| TL01 | Tela de Login | Personal, Aluno | Formulário de e-mail e senha. |
+| TL02 | Dashboard do Personal Trainer | Personal | Acesso rápido a alunos, exercícios e treinos. |
+| TL03 | Cadastro de Aluno | Personal | Formulário com os dados básicos do aluno. |
+| TL04 | Lista de Alunos | Personal | Tabela de alunos com ações de consultar, editar e excluir. |
+| TL05 | Cadastro de Exercício | Personal | Formulário com nome, descrição e grupo muscular. |
+| TL06 | Lista de Exercícios | Personal | Lista com busca dos exercícios cadastrados. |
+| TL07 | Cadastro de Treino | Personal | Criação do treino, seleção de aluno e adição de exercícios com séries, repetições, carga e intervalo. |
+| TL08 | Edição de Treino | Personal | Alteração dos dados do treino e de seus exercícios. |
+| TL09 | Dashboard do Aluno | Aluno | Lista dos treinos disponíveis para o aluno. |
+| TL10 | Visualização do Treino | Aluno | Exercícios do treino com séries, repetições, carga e intervalo. |
+
+Os protótipos das telas deverão ser armazenados no diretório `/prototipos/`.
+
+---
+
+## 7. Requisitos de API REST
+
+**Convenções**
+
+- URL base: `/api/v1`
+- Formato de dados: JSON
+- Autenticação: token enviado no cabeçalho `Authorization: Bearer <token>`, obtido no login
+- Códigos de status: `200` sucesso, `201` criado, `204` sem conteúdo, `400` requisição inválida, `401` não autenticado, `403` sem permissão, `404` não encontrado, `409` conflito, `422` dados inválidos
+
+| Método | Endpoint | Perfil | Descrição | Requisito |
+|---|---|---|---|---|
+| POST | `/auth/login` | Todos | Autentica o usuário e retorna o token | RF06 |
+| POST | `/personais` | Público | Cadastra um personal trainer | RF01 |
+| GET | `/alunos` | Personal | Lista os alunos do personal | RF03 |
+| POST | `/alunos` | Personal | Cadastra um aluno | RF02 |
+| GET | `/alunos/{id}` | Personal | Consulta um aluno | RF03 |
+| PUT | `/alunos/{id}` | Personal | Altera os dados de um aluno | RF04 |
+| DELETE | `/alunos/{id}` | Personal | Exclui um aluno | RF05 |
+| GET | `/exercicios` | Personal | Lista os exercícios | RF09 |
+| POST | `/exercicios` | Personal | Cadastra um exercício | RF08 |
+| GET | `/exercicios/{id}` | Personal | Consulta um exercício | RF09 |
+| GET | `/treinos` | Personal | Lista os treinos elaborados pelo personal | RF10 |
+| POST | `/treinos` | Personal | Cria um treino | RF10 |
+| GET | `/treinos/{id}` | Personal | Consulta um treino com seus itens | RF10 |
+| PUT | `/treinos/{id}` | Personal | Altera um treino | RF13 |
+| DELETE | `/treinos/{id}` | Personal | Exclui um treino | RF14 |
+| POST | `/treinos/{id}/itens` | Personal | Adiciona um exercício ao treino, com séries, repetições, carga e intervalo | RF11, RF12 |
+| PUT | `/treinos/{id}/itens/{id_item}` | Personal | Altera séries, repetições, carga e intervalo de um item | RF12 |
+| DELETE | `/treinos/{id}/itens/{id_item}` | Personal | Remove um exercício do treino | RF11 |
+| PUT | `/treinos/{id}/aluno` | Personal | Associa o treino a um aluno | RF15 |
+| GET | `/alunos/me` | Aluno | Consulta os dados do próprio aluno | RF16 |
+| GET | `/alunos/me/treinos` | Aluno | Lista os treinos do aluno | RF16 |
+| GET | `/alunos/me/treinos/{id}` | Aluno | Consulta um treino com exercícios e detalhes | RF17, RF18 |
+| GET | `/alunos/me/historico` | Aluno | Lista treinos anteriores (opcional) | RF19 |
+
+**Exemplo: criação de treino** — `POST /api/v1/treinos`
+
+```json
+{
+  "nome": "Treino A - Peito e Tríceps",
+  "descricao": "Foco em hipertrofia",
+  "id_aluno": 12
+}
+```
+
+Resposta `201 Created`:
+
+```json
+{
+  "id": 7,
+  "nome": "Treino A - Peito e Tríceps",
+  "descricao": "Foco em hipertrofia",
+  "id_aluno": 12,
+  "id_personal": 3
+}
+```
+
+**Exemplo: adição de exercício ao treino** — `POST /api/v1/treinos/7/itens`
+
+```json
+{
+  "id_exercicio": 4,
+  "series": 4,
+  "repeticoes": 10,
+  "carga": 30.0,
+  "intervalo": 60
+}
+```
+
+**Formato padrão de erro**
+
+```json
+{
+  "erro": "Dados inválidos",
+  "detalhes": { "series": "Deve ser um inteiro maior que zero" }
+}
+```
+
+---
+
+## 8. Requisitos
+
+### 8.1 Requisitos Funcionais
+
+| ID | Requisito | Descrição |
+|---|---|---|
+| RF01 | Cadastro de Personal | O sistema deverá permitir o cadastro de personal trainers, armazenando as informações necessárias para sua identificação e acesso ao sistema. |
+| RF02 | Cadastro de Aluno | O sistema deverá permitir que o personal trainer cadastre alunos, informando seus dados básicos. |
+| RF03 | Consulta de Alunos | O sistema deverá permitir que o personal trainer consulte os alunos cadastrados. |
+| RF04 | Alteração de Aluno | O sistema deverá permitir que o personal trainer altere os dados de um aluno cadastrado. |
+| RF05 | Exclusão de Aluno | O sistema deverá permitir que o personal trainer exclua um aluno cadastrado, respeitando as regras de integridade do banco de dados. |
+| RF06 | Login | O sistema deverá permitir que personal trainers e alunos realizem autenticação utilizando suas credenciais. |
+| RF07 | Controle de Acesso | O sistema deverá identificar o tipo de usuário autenticado e disponibilizar somente as funcionalidades correspondentes ao seu perfil. |
+| RF08 | Cadastro de Exercícios | O sistema deverá permitir que o personal trainer cadastre exercícios, incluindo informações como nome, descrição e grupo muscular. |
+| RF09 | Consulta de Exercícios | O sistema deverá permitir a consulta dos exercícios cadastrados. |
+| RF10 | Criação de Treino | O sistema deverá permitir que o personal trainer crie um treino para um aluno. |
+| RF11 | Adição de Exercícios ao Treino | O sistema deverá permitir que o personal trainer adicione exercícios a um treino. |
+| RF12 | Configuração dos Exercícios | O sistema deverá permitir que o personal trainer informe séries, repetições, carga e intervalo dos exercícios. |
+| RF13 | Edição de Treino | O sistema deverá permitir que o personal trainer altere as informações de um treino existente. |
+| RF14 | Exclusão de Treino | O sistema deverá permitir que o personal trainer exclua um treino existente. |
+| RF15 | Associação de Treino ao Aluno | O sistema deverá permitir que um treino seja associado a um aluno específico. |
+| RF16 | Visualização do Treino pelo Aluno | O sistema deverá permitir que o aluno visualize os treinos associados ao seu perfil. |
+| RF17 | Visualização dos Exercícios | O sistema deverá permitir que o aluno visualize os exercícios pertencentes ao seu treino. |
+| RF18 | Visualização das Informações do Exercício | O sistema deverá apresentar ao aluno séries, repetições, carga e intervalo, quando essas informações estiverem cadastradas. |
+| RF19 | Histórico de Treinos | O sistema poderá permitir que o aluno consulte treinos anteriormente disponibilizados. |
+
+### 8.2 Requisitos Não Funcionais
+
+| ID | Requisito | Descrição |
+|---|---|---|
+| RNF01 | Segurança | O sistema deverá controlar o acesso às funcionalidades de acordo com o perfil do usuário. |
+| RNF02 | Autenticação | O sistema deverá realizar a autenticação dos usuários antes de permitir o acesso às funcionalidades restritas. |
+| RNF03 | Usabilidade | A interface deverá apresentar navegação simples, organizada e compreensível para os usuários. |
+| RNF04 | Responsividade | A aplicação deverá adaptar sua interface a diferentes tamanhos de tela, permitindo sua utilização em computadores, tablets e smartphones. |
+| RNF05 | Desempenho | O sistema deverá apresentar tempo de resposta adequado para as operações comuns de cadastro, consulta, alteração e exclusão. |
+| RNF06 | Integridade dos Dados | O sistema deverá manter a consistência e integridade das informações armazenadas no banco de dados. |
+| RNF07 | Disponibilidade | As funcionalidades deverão estar disponíveis para os usuários autorizados enquanto o sistema estiver em funcionamento. |
+| RNF08 | Compatibilidade | O sistema deverá funcionar em navegadores modernos. |
+| RNF09 | Manutenibilidade | O código deverá ser organizado de maneira que facilite futuras alterações, correções e manutenção. |
+| RNF10 | Versionamento | Os principais artefatos do projeto deverão ser controlados por meio de um sistema de controle de versão, permitindo acompanhar as alterações realizadas durante o desenvolvimento. |
+
+---
+
+## 9. Rastreabilidade
+
+A rastreabilidade relaciona os requisitos aos respectivos Itens de Configuração (ICs) do projeto, permitindo acompanhar a evolução dos artefatos durante o desenvolvimento.
+
+### 9.1 Itens de Configuração
+
+| Código | Item de Configuração |
+|---|---|
+| IC01 | Plano de Projeto |
+| IC02 | Documento de Requisitos |
+| IC03 | Diagrama de Casos de Uso |
+| IC04 | Diagrama de Classes |
+| IC05 | Protótipos de Interface |
+| IC06 | Código-Fonte |
+| IC07 | Banco de Dados |
+| IC08 | README |
+
+### 9.2 Matriz de Rastreabilidade
+
+| Requisito | Descrição | Item de Configuração |
+|---|---|---|
+| RF01 | Cadastro de Personal | IC06 / IC07 |
+| RF02 | Cadastro de Aluno | IC06 / IC07 |
+| RF03 | Consulta de Alunos | IC06 / IC07 |
+| RF04 | Alteração de Aluno | IC06 / IC07 |
+| RF05 | Exclusão de Aluno | IC06 / IC07 |
+| RF06 | Login | IC03 / IC06 / IC07 |
+| RF07 | Controle de Acesso | IC03 / IC06 |
+| RF08 | Cadastro de Exercícios | IC06 / IC07 |
+| RF09 | Consulta de Exercícios | IC06 / IC07 |
+| RF10 | Criação de Treino | IC03 / IC04 / IC06 / IC07 |
+| RF11 | Adição de Exercícios | IC04 / IC06 / IC07 |
+| RF12 | Configuração dos Exercícios | IC04 / IC06 / IC07 |
+| RF13 | Edição de Treino | IC06 / IC07 |
+| RF14 | Exclusão de Treino | IC06 / IC07 |
+| RF15 | Associação de Treino ao Aluno | IC04 / IC06 / IC07 |
+| RF16 | Visualização do Treino | IC05 / IC06 |
+| RF17 | Visualização dos Exercícios | IC05 / IC06 |
+| RF18 | Informações do Exercício | IC05 / IC06 |
+| RF19 | Histórico de Treinos | IC05 / IC06 / IC07 |
+| RNF01 | Segurança | IC06 / IC07 |
+| RNF02 | Autenticação | IC06 / IC07 |
+| RNF03 | Usabilidade | IC05 / IC06 |
+| RNF04 | Responsividade | IC05 / IC06 |
+| RNF05 | Desempenho | IC06 / IC07 |
+| RNF06 | Integridade dos Dados | IC07 |
+| RNF07 | Disponibilidade | IC06 / IC07 |
+| RNF08 | Compatibilidade | IC05 / IC06 |
+| RNF09 | Manutenibilidade | IC06 |
+| RNF10 | Versionamento | IC01 / IC02 / IC06 / IC07 |
+
+---
+
+## 10. Controle de Mudanças
+
+As alterações realizadas nos requisitos e demais artefatos do projeto deverão ser registradas por meio do sistema de controle de versão utilizado pela equipe. As alterações deverão possuir mensagens de commit claras, permitindo identificar o conteúdo modificado.
+
+Exemplos:
+
+```
+docs: adiciona documento de requisitos
+docs: atualiza plano de projeto
+docs: adiciona diagrama de casos de uso
+docs: atualiza matriz de rastreabilidade
+feat: adiciona cadastro de alunos
+feat: adiciona cadastro de exercícios
+feat: adiciona gerenciamento de treinos
+fix: corrige cadastro de alunos
+```
+
+Alterações significativas nos requisitos deverão ser registradas em uma nova versão do documento, mantendo o histórico das versões anteriores (tabela de versões no início deste documento).
+
+---
+
+## 11. Considerações Finais
+
+Este Documento de Requisitos apresenta as principais características, funcionalidades e restrições previstas para o desenvolvimento do GymManager.
+
+O documento servirá como referência para as etapas seguintes do projeto, orientando o desenvolvimento do sistema, a elaboração do banco de dados, a criação das interfaces e a implementação das funcionalidades.
+
+Durante o desenvolvimento, os requisitos poderão ser alterados conforme as necessidades identificadas pela equipe. Essas alterações deverão ser registradas e controladas de acordo com as práticas de Gerência de Configuração adotadas no projeto.
+
+A utilização da rastreabilidade permitirá relacionar os requisitos aos respectivos Itens de Configuração, facilitando o acompanhamento das mudanças e a manutenção dos artefatos do projeto.
