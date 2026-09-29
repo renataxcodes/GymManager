@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f3f2ed">
+  <title>{% if user %}Painel | GymManager{% else %}GymManager | Treino com propósito{% endif %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+{% if not user %}
+  <main class="login-layout">
+    <section class="login-visual">
+      <a class="brand brand-light" href="{{ url_for('login') }}"><span class="brand-mark">G</span> gymmanager</a>
+      <div class="visual-copy">
+        <p class="eyebrow">TREINO COM PROPÓSITO</p>
+        <h1>O próximo nível começa no acompanhamento.</h1>
+        <p>Uma rotina mais clara para quem orienta. Um treino mais consistente para quem pratica.</p>
+      </div>
+      <div class="visual-foot"><span>01 / 03</span><span class="visual-line"></span><span>ACOMPANHAR · EVOLUIR</span></div>
+    </section>
+    <section class="login-panel">
+      <div class="mobile-brand"><a class="brand" href="{{ url_for('login') }}"><span class="brand-mark">G</span> gymmanager</a></div>
+      <div class="login-box">
+        <p class="eyebrow">ESPAÇO DE TREINO</p>
+        <h2>Entre na sua conta</h2>
+        <p class="muted">Acesse seus treinos e acompanhe sua rotina.</p>
+        {% with messages = get_flashed_messages(with_categories=true) %}{% for category, message in messages %}<div class="notice {{ category }}">{{ message }}</div>{% endfor %}{% endwith %}
+        <form method="post" class="form-stack">
+          <label>E-mail<input name="email" type="email" autocomplete="username" placeholder="voce@email.com" required></label>
+          <label>Senha<input name="password" type="password" autocomplete="current-password" placeholder="Sua senha" required></label>
+          <button class="button button-dark button-wide" type="submit">Entrar <span aria-hidden="true">↗</span></button>
+        </form>
+        <div class="demo-access"><span class="demo-dot"></span><div><strong>Acesso de demonstração</strong><p>Personal: personal@gymmanager.local<br>Aluno: ana@gymmanager.local<br>Senha para ambos: treino123</p></div></div>
+      </div>
+      <footer class="login-footer"><span>GYMMANAGER · 2026</span><span>FEITO PARA MOVIMENTO</span></footer>
+    </section>
+  </main>
+{% else %}
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="{{ url_for('dashboard') }}"><span class="brand-mark">G</span> gymmanager</a>
+      <p class="side-label">MENU</p>
+      {% if user.role == 'trainer' %}
+      <nav class="side-nav"><a class="active" href="#visao-geral"><span>◫</span> Visão geral</a><a href="#alunos"><span>♙</span> Alunos</a><a href="#exercicios"><span>⌁</span> Exercícios</a><a href="#treinos"><span>▤</span> Treinos</a></nav>
+      {% else %}
+      <nav class="side-nav"><a class="active" href="#meus-treinos"><span>▤</span> Meus treinos</a></nav>
+      {% endif %}
+      <div class="sidebar-bottom"><div class="user-chip"><span class="avatar">{{ user.name[:1] }}</span><div><strong>{{ user.name }}</strong><small>{{ 'Personal trainer' if user.role == 'trainer' else 'Aluno' }}</small></div></div><form method="post" action="{{ url_for('logout') }}"><button class="logout-button" type="submit">↪ <span>Sair da conta</span></button></form></div>
+    </aside>
+    <main class="main-content">
+      <header class="topbar"><div><span class="breadcrumb">{{ 'ESPAÇO DO PERSONAL' if user.role == 'trainer' else 'ÁREA DO ALUNO' }}</span><h1>{{ 'Visão geral' if user.role == 'trainer' else 'Olá, ' ~ user.name.split(' ')[0] ~ '.' }}</h1></div><div class="topbar-date"><span class="status-dot"></span> Conta ativa <span class="date-divider"></span>{{ user.name }}</div></header>
+      {% with messages = get_flashed_messages(with_categories=true) %}{% for category, message in messages %}<div class="notice {{ category }}">{{ message }}</div>{% endfor %}{% endwith %}
+      {% if user.role == 'trainer' %}
+      <section class="welcome-strip" id="visao-geral"><div><p class="eyebrow">{{ 'TERÇA-FEIRA · SEU ESPAÇO' }}</p><h2>Bom trabalho, {{ user.name.split(' ')[0] }}.</h2><p>Organize sua equipe e deixe cada treino pronto para acontecer.</p></div><div class="welcome-symbol">↗</div></section>
+      <section class="stat-grid"><article class="stat-item"><span>ALUNOS ATIVOS</span><strong>{{ students|length }}</strong><small>sob seu acompanhamento</small></article><article class="stat-item"><span>EXERCÍCIOS</span><strong>{{ exercises|length }}</strong><small>na sua biblioteca</small></article><article class="stat-item"><span>TREINOS CRIADOS</span><strong>{{ workouts|length }}</strong><small>disponíveis para consulta</small></article></section>
+      <div class="section-heading" id="alunos"><div><p class="eyebrow">ACOMPANHAMENTO</p><h2>Alunos</h2></div><button class="button button-lime" type="button" data-open="student-form">+ Novo aluno</button></div>
+      <section class="workspace-grid"><div class="data-panel"><div class="panel-heading"><div><h3>Seus alunos</h3><p>{{ students|length }} cadastro{{ '' if students|length == 1 else 's' }}</p></div><span class="panel-icon">♙</span></div>{% if students %}<div class="list-table"><div class="table-head"><span>NOME</span><span>E-MAIL</span><span>ACESSO</span></div>{% for student in students %}<div class="table-row"><span class="person-name"><i class="avatar avatar-small">{{ student.name[:1] }}</i>{{ student.name }}</span><span class="truncate">{{ student.email }}</span><span class="row-action"><span class="status-dot"></span> Ativo <form method="post" action="{{ url_for('delete_student', student_id=student.id) }}" onsubmit="return confirm('Remover este aluno e seus treinos?')"><button class="icon-button" title="Remover aluno" aria-label="Remover aluno">×</button></form></span></div>{% endfor %}</div>{% else %}<div class="empty-state">Nenhum aluno cadastrado ainda.</div>{% endif %}</div>
+      <aside class="side-note"><span class="note-icon">✳</span><p class="eyebrow">BOA ROTINA, BONS RESULTADOS</p><h3>O acompanhamento faz a diferença.</h3><p>Cadastre seus alunos e monte treinos pensados para cada jornada.</p><a href="#treinos">Criar um treino <span>↗</span></a></aside></section>
+      <section class="management-grid">
+        <article class="management-panel" id="exercicios"><div class="section-heading compact"><div><p class="eyebrow">BIBLIOTECA</p><h2>Exercícios</h2></div></div><form class="inline-form" method="post" action="{{ url_for('add_exercise') }}"><input name="name" placeholder="Nome do exercício" required><input name="muscle_group" placeholder="Grupo muscular" required><input name="description" placeholder="Descrição (opcional)"><button class="button button-dark" type="submit">Adicionar</button></form><div class="exercise-list">{% for exercise in exercises %}<div class="exercise-row"><span><strong>{{ exercise.name }}</strong><small>{{ exercise.muscle_group }}{% if exercise.description %} · {{ exercise.description }}{% endif %}</small></span><form method="post" action="{{ url_for('delete_exercise', exercise_id=exercise.id) }}"><button class="icon-button" title="Remover exercício" aria-label="Remover exercício">×</button></form></div>{% else %}<p class="empty-inline">Sua biblioteca está vazia.</p>{% endfor %}</div></article>
+        <article class="management-panel" id="treinos"><div class="section-heading compact"><div><p class="eyebrow">PRESCRIÇÃO DE TREINO</p><h2>{{ 'Editar treino' if editing_workout is defined else 'Novo treino' }}</h2></div></div>{% if students and exercises %}<form class="workout-form" method="post" action="{{ url_for('edit_workout', workout_id=editing_workout.id) if editing_workout is defined else url_for('add_workout') }}"><label>Nome do treino<input name="title" value="{{ editing_workout.title if editing_workout is defined else '' }}" placeholder="Ex.: Treino A · membros inferiores" required></label><label>Aluno<select name="student_id" required><option value="">Selecione um aluno</option>{% for student in students %}<option value="{{ student.id }}" {% if editing_workout is defined and editing_workout.student_id == student.id %}selected{% endif %}>{{ student.name }}</option>{% endfor %}</select></label><div class="exercise-builder" data-exercise-builder>{% if editing_workout is defined %}{% for item in editing_workout.items %}<div class="exercise-entry"><select name="exercise_id[]" required><option value="">Escolha um exercício</option>{% for exercise in exercises %}<option value="{{ exercise.id }}" {% if item.exercise_id == exercise.id %}selected{% endif %}>{{ exercise.name }} · {{ exercise.muscle_group }}</option>{% endfor %}</select><input name="sets[]" type="number" min="1" value="{{ item.sets }}" aria-label="Séries" placeholder="Séries"><input name="reps[]" value="{{ item.reps }}" aria-label="Repetições" placeholder="Reps"><input name="load[]" value="{{ item.load }}" aria-label="Carga" placeholder="Carga"><input name="rest[]" value="{{ item.rest }}" aria-label="Intervalo" placeholder="Intervalo"></div>{% endfor %}{% else %}<div class="exercise-entry"><select name="exercise_id[]" required><option value="">Escolha um exercício</option>{% for exercise in exercises %}<option value="{{ exercise.id }}">{{ exercise.name }} · {{ exercise.muscle_group }}</option>{% endfor %}</select><input name="sets[]" type="number" min="1" value="3" aria-label="Séries" placeholder="Séries"><input name="reps[]" value="12" aria-label="Repetições" placeholder="Reps"><input name="load[]" aria-label="Carga" placeholder="Carga"><input name="rest[]" aria-label="Intervalo" placeholder="Intervalo"></div>{% endif %}</div><button class="add-row" type="button" data-add-exercise>+ Adicionar exercício</button><label>Observações<textarea name="notes" rows="2" placeholder="Orientações para o aluno">{{ editing_workout.notes if editing_workout is defined else '' }}</textarea></label><div><button class="button button-lime" type="submit">{{ 'Salvar alterações' if editing_workout is defined else 'Publicar treino' }} <span>↗</span></button>{% if editing_workout is defined %} <a href="{{ url_for('dashboard') }}#treinos">Cancelar</a>{% endif %}</div></form>{% else %}<p class="empty-inline">Cadastre ao menos um aluno e um exercício para criar treinos.</p>{% endif %}</article>
+      </section>
+      <section class="recent-section"><div class="section-heading compact"><div><p class="eyebrow">ACOMPANHAMENTO</p><h2>Treinos recentes</h2></div></div><div class="workout-list">{% for workout in workouts %}<article class="workout-card"><div class="workout-mark">▤</div><div class="workout-info"><strong>{{ workout.title }}</strong><small>{{ workout.student.name }} · {{ workout.items|length }} exercício{{ '' if workout.items|length == 1 else 's' }}</small></div><span class="workout-date">{{ workout.created_at.strftime('%d/%m/%Y') }}</span><a class="icon-button" href="{{ url_for('edit_workout', workout_id=workout.id) }}#treinos" title="Editar treino" aria-label="Editar treino">✎</a><form method="post" action="{{ url_for('delete_workout', workout_id=workout.id) }}" onsubmit="return confirm('Remover este treino?')"><button class="icon-button" title="Remover treino" aria-label="Remover treino">×</button></form></article>{% else %}<p class="empty-inline">Seus treinos publicados aparecerão aqui.</p>{% endfor %}</div></section>
+      {% else %}
+      <section class="student-intro" id="meus-treinos"><div><p class="eyebrow">SUA JORNADA, SEU RITMO</p><h2>Treinos feitos para você.</h2><p>Consulte os exercícios e as orientações do seu personal.</p></div><span class="student-icon">↗</span></section>
+      <div class="student-workouts">{% for workout in workouts %}<article class="student-workout"><header><div><span class="eyebrow">{{ workout.created_at.strftime('%d.%m.%Y') }} · {{ workout.items|length }} EXERCÍCIOS</span><h2>{{ workout.title }}</h2></div><span class="workout-mark">▤</span></header>{% if workout.notes %}<p class="workout-notes">{{ workout.notes }}</p>{% endif %}<div class="student-exercises">{% for item in workout.items %}<div class="student-exercise"><div class="exercise-number">{{ '%02d'|format(loop.index) }}</div><div class="student-exercise-name"><strong>{{ item.exercise.name }}</strong><small>{{ item.exercise.muscle_group }}</small></div><div class="exercise-metric"><strong>{{ item.sets }} × {{ item.reps }}</strong><small>SÉRIES × REPETIÇÕES</small></div><div class="exercise-metric"><strong>{{ item.load or 'Livre' }}</strong><small>CARGA</small></div><div class="exercise-metric"><strong>{{ item.rest or '—' }}</strong><small>INTERVALO</small></div></div>{% endfor %}</div></article>{% else %}<div class="empty-state student-empty"><span>▤</span><h2>Nenhum treino por enquanto</h2><p>Quando seu personal publicar um treino, ele aparecerá aqui.</p></div>{% endfor %}</div>
+      {% endif %}
+      <footer class="app-footer"><span>GYMMANAGER · ESPAÇO DE TREINO</span><span>CONSISTÊNCIA É PROGRESSO</span></footer>
+    </main>
+  </div>
+  <dialog class="modal" id="student-form"><form method="post" action="{{ url_for('add_student') }}"><div class="modal-head"><div><p class="eyebrow">NOVO CADASTRO</p><h2>Adicionar aluno</h2></div><button class="icon-button" type="button" data-close aria-label="Fechar">×</button></div><label>Nome completo<input name="name" required placeholder="Nome do aluno"></label><label>E-mail de acesso<input name="email" type="email" required placeholder="aluno@email.com"></label><label>Senha inicial<input name="password" type="password" placeholder="Padrão: treino123"></label><p class="muted small">Se deixar em branco, a senha inicial será treino123.</p><button class="button button-dark button-wide" type="submit">Cadastrar aluno</button></form></dialog>
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+{% endif %}
+</body>
+</html>

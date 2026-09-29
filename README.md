@@ -1,44 +1,43 @@
 # GymManager
-# Gerenciador de Treinos
 
-Sistema web para gerenciamento de treinos entre personal trainers e alunos.
+Aplicação web para personal trainers organizarem alunos, exercícios e treinos. Os alunos acessam seus próprios treinos e as orientações de cada exercício.
 
-## Sobre o projeto
+## Executar localmente
 
-O sistema tem como objetivo facilitar a criação, organização e acompanhamento
-de treinos, permitindo que o personal trainer gerencie seus alunos e montar
-treinos personalizados, enquanto o aluno pode consultar seus exercícios e
-informações de treinamento.
+Requer Python 3.10 ou superior.
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+python app.py
+```
+
+Abra http://127.0.0.1:5000. O banco SQLite é criado automaticamente em `instance/gymmanager.db` com dados de demonstração.
+
+| Perfil | E-mail | Senha |
+| --- | --- | --- |
+| Personal | `personal@gymmanager.local` | `treino123` |
+| Aluno | `ana@gymmanager.local` | `treino123` |
 
 ## Funcionalidades
 
-### Personal
-- Cadastro de alunos
-- Cadastro de exercícios
-- Criação de treinos
-- Edição de treinos
-- Associação de treinos aos alunos
+- Login e acesso separado por perfil;
+- Cadastro e remoção de alunos;
+- Cadastro e remoção de exercícios;
+- Criação e edição de treinos com vários exercícios, séries, repetições, carga e intervalo;
+- Consulta dos treinos pelo aluno;
+- Remoção de treinos.
 
-### Aluno
-- Login
-- Visualização dos treinos
-- Visualização dos exercícios
-- Consulta de séries, repetições, carga e intervalo
+## Banco de dados
 
-## Tecnologias
+Por padrão, a aplicação usa SQLite para facilitar a execução local. Para usar MySQL, configure `DATABASE_URL` com uma URL SQLAlchemy, por exemplo `mysql+pymysql://usuario:senha@localhost/gymmanager`. Também defina `SECRET_KEY` com um valor aleatório antes de disponibilizar a aplicação fora do ambiente local. As credenciais demonstrativas e a chave padrão são somente para desenvolvimento.
 
-- HTML
-- CSS
-- JavaScript
-- Python
-- Flask
-- MySQL
+## Estrutura
 
-## Estrutura do projeto
-
-- `/docs` — documentação
-- `/diagramas` — diagramas do sistema
-- `/prototipos` — protótipos das telas
-- `/src` — código-fonte
-- `/database` — scripts do banco de dados
+- `app.py` — aplicação Flask e modelos de dados;
+- `templates/` — interface HTML;
+- `static/` — estilos e interações da interface;
+- `docs/` — documentação do projeto;
+- `prototipos/` — protótipos das telas.
 
