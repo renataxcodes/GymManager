@@ -114,23 +114,36 @@ def dashboard():
     user = signed_in_user()
     if user.role == "student":
         workouts = Workout.query.filter_by(student_id=user.id).order_by(Workout.created_at.desc()).all()
-        return render_template("index.html", user=user, workouts=workouts)
-
-    students = User.query.filter_by(trainer_id=user.id, role="student").order_by(User.name).all()
-    exercises = Exercise.query.filter_by(trainer_id=user.id).order_by(Exercise.name).all()
-    workouts = Workout.query.filter_by(trainer_id=user.id).order_by(Workout.created_at.desc()).all()
-    return render_template(
-        "index.html", user=user, students=students, exercises=exercises, workouts=workouts
-    )
+        return render_template("index.html", user=user, workouts=workouts, page="student")
+    return render_template("index.html", **trainer_dashboard_data(user, "overview"))
 
 
-def trainer_dashboard_data(user):
+def trainer_dashboard_data(user, page):
     return {
         "user": user,
+        "page": page,
         "students": User.query.filter_by(trainer_id=user.id, role="student").order_by(User.name).all(),
         "exercises": Exercise.query.filter_by(trainer_id=user.id).order_by(Exercise.name).all(),
         "workouts": Workout.query.filter_by(trainer_id=user.id).order_by(Workout.created_at.desc()).all(),
     }
+
+
+@app.get("/students")
+@trainer_required
+def students_page():
+    return render_template("index.html", **trainer_dashboard_data(signed_in_user(), "students"))
+
+
+@app.get("/exercises")
+@trainer_required
+def exercises_page():
+    return render_template("index.html", **trainer_dashboard_data(signed_in_user(), "exercises"))
+
+
+@app.get("/workouts")
+@trainer_required
+def workouts_page():
+    return render_template("index.html", **trainer_dashboard_data(signed_in_user(), "workouts"))
 
 
 @app.post("/students")
@@ -151,7 +164,7 @@ def add_student():
         db.session.add(student)
         db.session.commit()
         flash("Aluno cadastrado. A senha inicial é treino123, caso não tenha sido definida.", "success")
-    return redirect(url_for("dashboard") + "#alunos")
+    return redirect(url_for("students_page"))
 
 
 @app.post("/students/<int:student_id>/delete")
@@ -162,7 +175,7 @@ def delete_student(student_id):
     db.session.delete(student)
     db.session.commit()
     flash("Aluno removido.", "success")
-    return redirect(url_for("dashboard") + "#alunos")
+    return redirect(url_for("students_page"))
 
 
 @app.post("/exercises")
@@ -181,7 +194,7 @@ def add_exercise():
         ))
         db.session.commit()
         flash("Exercício cadastrado.", "success")
-    return redirect(url_for("dashboard") + "#exercicios")
+    return redirect(url_for("exercises_page"))
 
 
 @app.post("/exercises/<int:exercise_id>/delete")
@@ -194,7 +207,7 @@ def delete_exercise(exercise_id):
         db.session.delete(exercise)
         db.session.commit()
         flash("Exercício removido.", "success")
-    return redirect(url_for("dashboard") + "#exercicios")
+    return redirect(url_for("exercises_page"))
 
 
 @app.post("/workouts")
@@ -211,7 +224,7 @@ def edit_workout(workout_id):
     ).first_or_404()
     if request.method == "POST":
         return save_workout(workout)
-    context = trainer_dashboard_data(signed_in_user())
+    context = trainer_dashboard_data(signed_in_user(), "workouts")
     context["editing_workout"] = workout
     return render_template("index.html", **context)
 
@@ -226,7 +239,7 @@ def save_workout(workout=None):
     exercise_ids = request.form.getlist("exercise_id[]")
     if not student or not title or not exercise_ids:
         flash("Informe aluno, nome do treino e pelo menos um exercício.", "error")
-        destination = url_for("edit_workout", workout_id=workout.id) if workout else url_for("dashboard")
+        destination = url_for("edit_workout", workout_id=workout.id) if workout else url_for("workouts_page")
         return redirect(destination + "#treinos")
 
     exercises = {
@@ -247,7 +260,7 @@ def save_workout(workout=None):
         ))
     if not selected:
         flash("Selecione ao menos um exercício cadastrado por você.", "error")
-        destination = url_for("edit_workout", workout_id=workout.id) if workout else url_for("dashboard")
+        destination = url_for("edit_workout", workout_id=workout.id) if workout else url_for("workouts_page")
         return redirect(destination + "#treinos")
 
     if workout:
@@ -266,7 +279,7 @@ def save_workout(workout=None):
     db.session.add(workout)
     db.session.commit()
     flash("Treino atualizado." if is_edit else "Treino criado e disponibilizado para o aluno.", "success")
-    return redirect(url_for("dashboard") + "#treinos")
+    return redirect(url_for("workouts_page"))
 
 
 @app.post("/workouts/<int:workout_id>/delete")
@@ -276,7 +289,7 @@ def delete_workout(workout_id):
     db.session.delete(workout)
     db.session.commit()
     flash("Treino removido.", "success")
-    return redirect(url_for("dashboard") + "#treinos")
+    return redirect(url_for("workouts_page"))
 
 
 with app.app_context():
