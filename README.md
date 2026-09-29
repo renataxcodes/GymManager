@@ -25,8 +25,10 @@ Abra http://127.0.0.1:5000. O banco SQLite é criado automaticamente em `instanc
 - Login e acesso separado por perfil;
 - Cadastro e remoção de alunos;
 - Cadastro e remoção de exercícios;
+- Busca de alunos, exercícios e treinos, com filtro de exercícios por grupo muscular e de treinos por aluno;
 - Criação e edição de treinos com vários exercícios, séries, repetições, carga e intervalo;
 - Consulta dos treinos pelo aluno;
+- Registro da conclusão do treino pelo aluno, com data visível para ele e para o personal;
 - Remoção de treinos.
 
 ## Banco de dados

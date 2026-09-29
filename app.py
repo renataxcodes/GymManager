@@ -46,7 +46,20 @@ class Workout(db.Model):
     notes = db.Column(db.Text, default="")
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     items = db.relationship("WorkoutItem", backref="workout", cascade="all, delete-orphan")
+    completion = db.relationship(
+        "WorkoutCompletion",
+        back_populates="workout",
+        uselist=False,
+        cascade="all, delete-orphan",
+    )
     student = db.relationship("User", foreign_keys=[student_id])
+
+
+class WorkoutCompletion(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    workout_id = db.Column(db.Integer, db.ForeignKey("workout.id"), unique=True, nullable=False)
+    completed_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    workout = db.relationship("Workout", back_populates="completion")
 
 
 class WorkoutItem(db.Model):
@@ -86,6 +99,17 @@ def trainer_required(view):
     return wrapped
 
 
+def student_required(view):
+    @wraps(view)
+    @login_required
+    def wrapped(*args, **kwargs):
+        if signed_in_user().role != "student":
+            abort(403)
+        return view(*args, **kwargs)
+
+    return wrapped
+
+
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if signed_in_user():
@@ -119,12 +143,56 @@ def dashboard():
 
 
 def trainer_dashboard_data(user, page):
+    students = User.query.filter_by(trainer_id=user.id, role="student").order_by(User.name).all()
+    exercises = Exercise.query.filter_by(trainer_id=user.id).order_by(Exercise.name).all()
+    workouts = Workout.query.filter_by(trainer_id=user.id).order_by(Workout.created_at.desc()).all()
+
+    student_query = request.args.get("student_q", "").strip()
+    student_results = [
+        student for student in students
+        if not student_query
+        or student_query.casefold() in student.name.casefold()
+        or student_query.casefold() in student.email.casefold()
+    ]
+
+    exercise_query = request.args.get("exercise_q", "").strip()
+    muscle_group = request.args.get("muscle_group", "").strip()
+    exercise_results = [
+        exercise for exercise in exercises
+        if (not exercise_query
+            or exercise_query.casefold() in exercise.name.casefold()
+            or exercise_query.casefold() in exercise.muscle_group.casefold())
+        and (not muscle_group or exercise.muscle_group == muscle_group)
+    ]
+
+    workout_query = request.args.get("workout_q", "").strip()
+    workout_student = request.args.get("workout_student", "").strip()
+    workout_results = [
+        workout for workout in workouts
+        if (not workout_query
+            or workout_query.casefold() in workout.title.casefold()
+            or workout_query.casefold() in workout.student.name.casefold())
+        and (not workout_student or str(workout.student_id) == workout_student)
+    ]
+
     return {
         "user": user,
         "page": page,
-        "students": User.query.filter_by(trainer_id=user.id, role="student").order_by(User.name).all(),
-        "exercises": Exercise.query.filter_by(trainer_id=user.id).order_by(Exercise.name).all(),
-        "workouts": Workout.query.filter_by(trainer_id=user.id).order_by(Workout.created_at.desc()).all(),
+        "students": student_results if page == "students" else students,
+        "total_students": len(students),
+        "student_results": student_results,
+        "student_query": student_query,
+        "exercises": exercise_results if page == "exercises" else exercises,
+        "total_exercises": len(exercises),
+        "exercise_results": exercise_results,
+        "exercise_query": exercise_query,
+        "muscle_group": muscle_group,
+        "muscle_groups": sorted({exercise.muscle_group for exercise in exercises}, key=str.casefold),
+        "workouts": workout_results if page == "workouts" else workouts,
+        "total_workouts": len(workouts),
+        "workout_results": workout_results,
+        "workout_query": workout_query,
+        "workout_student": workout_student,
     }
 
 
@@ -171,7 +239,8 @@ def add_student():
 @trainer_required
 def delete_student(student_id):
     student = User.query.filter_by(id=student_id, trainer_id=signed_in_user().id, role="student").first_or_404()
-    Workout.query.filter_by(student_id=student.id).delete()
+    for workout in Workout.query.filter_by(student_id=student.id).all():
+        db.session.delete(workout)
     db.session.delete(student)
     db.session.commit()
     flash("Aluno removido.", "success")
@@ -264,6 +333,8 @@ def save_workout(workout=None):
         return redirect(destination + "#treinos")
 
     if workout:
+        if workout.completion:
+            workout.completion = None
         workout.student = student
         workout.title = title
         workout.notes = request.form.get("notes", "").strip()
@@ -290,6 +361,18 @@ def delete_workout(workout_id):
     db.session.commit()
     flash("Treino removido.", "success")
     return redirect(url_for("workouts_page"))
+
+
+@app.post("/workouts/<int:workout_id>/complete")
+@student_required
+def complete_workout(workout_id):
+    student = signed_in_user()
+    workout = Workout.query.filter_by(id=workout_id, student_id=student.id).first_or_404()
+    if not workout.completion:
+        db.session.add(WorkoutCompletion(workout=workout))
+        db.session.commit()
+        flash("Treino marcado como concluído. Boa evolução!", "success")
+    return redirect(url_for("dashboard"))
 
 
 with app.app_context():
